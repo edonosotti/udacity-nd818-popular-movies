@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="network_unavailable">Network connection unavailable!</string>
+    <string name="menu_sort_by_popularity">Sort by popularity</string>
+    <string name="menu_sort_by_rating">Sort by rating</string>
+    <string name="movie_info_release">Released: %1$s</string>
+    <string name="movie_info_rating">User rating: %1$s/10</string>
+    <string name="error_missing_api_key">API key is missing! Please provide a valid key.</string>
+</resources>
