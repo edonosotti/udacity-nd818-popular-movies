@@ -2,7 +2,7 @@
 
 ## Description
 
-This Android app is a course project for the "Udacity Associate Android Developer Fast Track Nanodegree Program".
+This Android app is a course project for the Udacity [**Associate Android Developer Fast Track Nanodegree Program**](https://www.udacity.com/course/associate-android-developer-fast-track--nd818).
 
 ## How to run
 
