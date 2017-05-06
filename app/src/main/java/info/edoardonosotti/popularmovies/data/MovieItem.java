@@ -14,8 +14,15 @@ public class MovieItem implements Parcelable {
     public Double averageUserRating;
     public Date releaseDate;
 
+    public long favouriteMovieRecordId;
+
+    public MovieItem() {
+
+    }
+
     public MovieItem(int id, String originalTitle, String plotSynopsys, URL posterImageUrl,
                      Double averageUserRating, Date releaseDate) {
+        this.id = id;
         this.originalTitle = originalTitle;
         this.plotSynopsys = plotSynopsys;
         this.posterImageUrl = posterImageUrl;
