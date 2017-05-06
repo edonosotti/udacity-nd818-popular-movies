@@ -35,6 +35,7 @@ public class TmdbMovieFeedParser {
                 }
 
                 movieItems.add(new MovieItem(
+                        movie.getInt("id"),
                         movie.getString("original_title"),
                         movie.getString("overview"),
                         TmdbApiHelper.buildImageUrl(movie.getString("poster_path")),

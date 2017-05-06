@@ -7,13 +7,14 @@ import java.net.URL;
 import java.util.Date;
 
 public class MovieItem implements Parcelable {
+    public int id;
     public String originalTitle;
     public String plotSynopsys;
     public URL posterImageUrl;
     public Double averageUserRating;
     public Date releaseDate;
 
-    public MovieItem(String originalTitle, String plotSynopsys, URL posterImageUrl,
+    public MovieItem(int id, String originalTitle, String plotSynopsys, URL posterImageUrl,
                      Double averageUserRating, Date releaseDate) {
         this.originalTitle = originalTitle;
         this.plotSynopsys = plotSynopsys;
@@ -29,6 +30,7 @@ public class MovieItem implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
+        out.writeInt(id);
         out.writeString(originalTitle);
         out.writeString(plotSynopsys);
         out.writeValue(posterImageUrl);
@@ -47,6 +49,7 @@ public class MovieItem implements Parcelable {
     };
 
     private MovieItem(Parcel in) {
+        id = in.readInt();
         originalTitle = in.readString();
         plotSynopsys = in.readString();
         posterImageUrl = (URL) in.readValue(URL.class.getClassLoader());
