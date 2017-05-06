@@ -46,6 +46,8 @@ public class MovieInfoActivity extends AppCompatActivity {
         Picasso
                 .with(MovieInfoActivity.this)
                 .load(movieItem.posterImageUrl.toString())
+                .placeholder(R.drawable.img_loading)
+                .error(R.drawable.img_no_image)
                 .into(mPoster);
     }
 }

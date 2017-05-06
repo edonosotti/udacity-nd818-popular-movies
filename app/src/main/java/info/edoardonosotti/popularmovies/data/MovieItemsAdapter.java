@@ -36,6 +36,8 @@ public class MovieItemsAdapter extends RecyclerView.Adapter<MovieItemsAdapter.Mo
         Picasso
                 .with(mContext)
                 .load(movieItem.posterImageUrl.toString())
+                .placeholder(R.drawable.img_loading)
+                .error(R.drawable.img_no_image)
                 .into(holder.mMoviePoster);
     }
 
