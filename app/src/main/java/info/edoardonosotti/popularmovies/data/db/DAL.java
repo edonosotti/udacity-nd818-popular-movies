@@ -74,7 +74,7 @@ public class DAL {
             movieItem.id = cursor.getInt(cursor.getColumnIndexOrThrow(FavouriteMoviesContract.FavouriteMovieItem.COLUMN_NAME_MOVIE_ID));
             movieItem.originalTitle = cursor.getString(cursor.getColumnIndexOrThrow(FavouriteMoviesContract.FavouriteMovieItem.COLUMN_NAME_TITLE));
 
-            String posterImageUrl = cursor.getString(cursor.getColumnIndexOrThrow(FavouriteMoviesContract.FavouriteMovieItem._ID));
+            String posterImageUrl = cursor.getString(cursor.getColumnIndexOrThrow(FavouriteMoviesContract.FavouriteMovieItem.COLUMN_NAME_POSTER));
 
             try {
                 movieItem.posterImageUrl = new URL(posterImageUrl);
