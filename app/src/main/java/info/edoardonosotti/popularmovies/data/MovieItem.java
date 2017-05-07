@@ -7,12 +7,16 @@ import java.net.URL;
 import java.util.Date;
 
 public class MovieItem implements Parcelable {
-    public int id;
+    public int id = -1;
+
     public String originalTitle;
     public String plotSynopsys;
     public URL posterImageUrl;
     public Double averageUserRating;
     public Date releaseDate;
+
+    public MovieTrailer[] trailers;
+    public MovieReview[] reviews;
 
     public long favouriteMovieRecordId;
 
@@ -28,6 +32,11 @@ public class MovieItem implements Parcelable {
         this.posterImageUrl = posterImageUrl;
         this.averageUserRating = averageUserRating;
         this.releaseDate = releaseDate;
+
+        this.trailers = new MovieTrailer[0];
+        this.reviews = new MovieReview[0];
+
+        this.favouriteMovieRecordId = -1;
     }
 
     @Override

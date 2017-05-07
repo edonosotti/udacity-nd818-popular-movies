@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(MovieItem movieItem) {
         Intent intent = new Intent(MainActivity.this, MovieInfoActivity.class);
-        intent.putExtra(INTENT_SELECTED_MOVIE, movieItem);
+        intent.putExtra(INTENT_SELECTED_MOVIE, movieItem.id);
         startActivity(intent);
     }
 

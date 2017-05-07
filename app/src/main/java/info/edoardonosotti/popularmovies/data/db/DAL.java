@@ -70,7 +70,7 @@ public class DAL {
             try {
                 movieItem.posterImageUrl = new URL(posterImageUrl);
             } catch (MalformedURLException e) {
-                Log.e(TAG, "Could not parse URL: " + posterImageUrl);
+                Log.e(TAG, "Could not parseMovieList URL: " + posterImageUrl);
                 e.printStackTrace();
             }
 
