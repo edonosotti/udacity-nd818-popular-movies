@@ -1,15 +1,11 @@
 package info.edoardonosotti.popularmovies;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.GridLayoutManager;
-import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,20 +15,12 @@ import android.widget.Toast;
 
 import info.edoardonosotti.popularmovies.data.MovieItem;
 import info.edoardonosotti.popularmovies.data.MovieItemsAdapter;
-import info.edoardonosotti.popularmovies.data.TmdbMovieFeedParser;
 import info.edoardonosotti.popularmovies.helpers.NetworkHelper;
-import info.edoardonosotti.popularmovies.helpers.TmdbApiHelper;
 import info.edoardonosotti.popularmovies.tasks.FetchMoviesTask;
 import info.edoardonosotti.popularmovies.tasks.IOnTaskCompleted;
 
-import java.net.URL;
-
 public class MainActivity extends AppCompatActivity
         implements MovieItemsAdapter.MovieItemsAdapterOnClickHandler, IOnTaskCompleted {
-
-    private static final String TAG = MainActivity.class.getSimpleName();
-
-    private static final String TMDB_API_KEY = "";
 
     public static final String INTENT_SELECTED_MOVIE = "SELECTED_MOVIE";
 
@@ -53,7 +41,7 @@ public class MainActivity extends AppCompatActivity
         setGridLayoutManager();
         setGridAdapter();
 
-        if (TMDB_API_KEY.equals("")) {
+        if (Common.TMDB_API_KEY.equals("")) {
             Toast.makeText(this, R.string.error_missing_api_key, Toast.LENGTH_LONG).show();
         } else {
             loadMovieData(FetchMoviesTask.SORT_MODE_POPULAR);
@@ -117,7 +105,7 @@ public class MainActivity extends AppCompatActivity
         mLoadingIndicator.setVisibility(View.VISIBLE);
         if (NetworkHelper.networkIsAvailable(MainActivity.this)) {
             FetchMoviesTask.FetchMoviesTaskConfiguration config =
-                    new FetchMoviesTask.FetchMoviesTaskConfiguration(TMDB_API_KEY, sortType);
+                    new FetchMoviesTask.FetchMoviesTaskConfiguration(Common.TMDB_API_KEY, sortType);
             new FetchMoviesTask(config, this).execute();
         } else {
             showErrorMessage();
