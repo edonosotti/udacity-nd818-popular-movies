@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity
 
     private MovieItemsAdapter mMovieItemsAdapter;
 
+    private boolean mFavouritesSelected = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +51,16 @@ public class MainActivity extends AppCompatActivity
         } else {
             mListTitle.setText(R.string.movie_list_title_popular);
             loadMovieData(FetchMoviesTask.SORT_MODE_POPULAR);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mFavouritesSelected) {
+            // Force refresh of favourite movies list on BACK from details activity
+            loadFavouritesMovieData();
         }
     }
 
@@ -80,7 +92,6 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
         else if (id == R.id.menu_action_show_favourites) {
-            mListTitle.setText(R.string.movie_list_title_favourite);
             loadFavouritesMovieData();
             return true;
         }
@@ -113,6 +124,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void loadMovieData(int sortType) {
+        mFavouritesSelected = false;
         mLoadingIndicator.setVisibility(View.VISIBLE);
         if (NetworkHelper.networkIsAvailable(MainActivity.this)) {
             FetchMoviesTask.FetchMoviesTaskConfiguration config =
@@ -124,6 +136,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     protected void loadFavouritesMovieData() {
+        mFavouritesSelected = true;
+        mLoadingIndicator.setVisibility(View.VISIBLE);
+        mListTitle.setText(R.string.movie_list_title_favourite);
         DAL dal = new DAL(this);
         MovieItem[] movieItems = dal.getFavouriteMovies();
         mMovieItemsAdapter.setMovieData(movieItems);
