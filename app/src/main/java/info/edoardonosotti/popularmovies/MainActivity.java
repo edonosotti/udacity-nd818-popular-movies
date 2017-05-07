@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import info.edoardonosotti.popularmovies.data.MovieItem;
 import info.edoardonosotti.popularmovies.data.MovieItemsAdapter;
+import info.edoardonosotti.popularmovies.data.db.DAL;
 import info.edoardonosotti.popularmovies.helpers.NetworkHelper;
 import info.edoardonosotti.popularmovies.tasks.FetchMoviesTask;
 import info.edoardonosotti.popularmovies.tasks.IOnTaskCompleted;
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView mRecyclerView;
     private ProgressBar mLoadingIndicator;
     private TextView mErrorMessageDisplay;
+    private TextView mListTitle;
 
     private MovieItemsAdapter mMovieItemsAdapter;
 
@@ -37,6 +39,7 @@ public class MainActivity extends AppCompatActivity
 
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
         mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
+        mListTitle = (TextView) findViewById(R.id.tv_movie_list_title);
 
         setGridLayoutManager();
         setGridAdapter();
@@ -44,6 +47,7 @@ public class MainActivity extends AppCompatActivity
         if (Common.TMDB_API_KEY.equals("")) {
             Toast.makeText(this, R.string.error_missing_api_key, Toast.LENGTH_LONG).show();
         } else {
+            mListTitle.setText(R.string.movie_list_title_popular);
             loadMovieData(FetchMoviesTask.SORT_MODE_POPULAR);
         }
     }
@@ -66,11 +70,18 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.menu_action_sort_by_popularity) {
+            mListTitle.setText(R.string.movie_list_title_popular);
             loadMovieData(FetchMoviesTask.SORT_MODE_POPULAR);
             return true;
         }
-        else if (id == R.id.menu_action_sort_by_rating){
+        else if (id == R.id.menu_action_sort_by_rating) {
+            mListTitle.setText(R.string.movie_list_title_toprated);
             loadMovieData(FetchMoviesTask.SORT_MODE_RATING);
+            return true;
+        }
+        else if (id == R.id.menu_action_show_favourites) {
+            mListTitle.setText(R.string.movie_list_title_favourite);
+            loadFavouritesMovieData();
             return true;
         }
 
@@ -108,19 +119,33 @@ public class MainActivity extends AppCompatActivity
                     new FetchMoviesTask.FetchMoviesTaskConfiguration(Common.TMDB_API_KEY, sortType);
             new FetchMoviesTask(config, this).execute();
         } else {
-            showErrorMessage();
+            showErrorMessage(R.string.network_unavailable);
         }
     }
 
-    private void showMoviesData() {
-        mLoadingIndicator.setVisibility(View.INVISIBLE);
-        mErrorMessageDisplay.setVisibility(View.INVISIBLE);
-        mRecyclerView.setVisibility(View.VISIBLE);
+    protected void loadFavouritesMovieData() {
+        DAL dal = new DAL(this);
+        MovieItem[] movieItems = dal.getFavouriteMovies();
+        mMovieItemsAdapter.setMovieData(movieItems);
+        mMovieItemsAdapter.notifyDataSetChanged();
+        showMoviesData();
     }
 
-    private void showErrorMessage() {
+    private void showMoviesData() {
+        if (mMovieItemsAdapter.getItemCount() > 0) {
+            mLoadingIndicator.setVisibility(View.INVISIBLE);
+            mErrorMessageDisplay.setVisibility(View.INVISIBLE);
+
+            mRecyclerView.setVisibility(View.VISIBLE);
+        } else {
+            showErrorMessage(R.string.no_data);
+        }
+    }
+
+    private void showErrorMessage(int errorStringId) {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.INVISIBLE);
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
+        mErrorMessageDisplay.setText(errorStringId);
     }
 }
