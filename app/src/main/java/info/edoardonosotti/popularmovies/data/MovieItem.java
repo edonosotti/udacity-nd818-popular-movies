@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import java.net.URL;
 import java.util.Date;
 
-public class MovieItem implements Parcelable {
+public class MovieItem {
     public int id = -1;
 
     public String originalTitle;
@@ -37,39 +37,5 @@ public class MovieItem implements Parcelable {
         this.reviews = new MovieReview[0];
 
         this.favouriteMovieRecordId = -1;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeInt(id);
-        out.writeString(originalTitle);
-        out.writeString(plotSynopsys);
-        out.writeValue(posterImageUrl);
-        out.writeDouble(averageUserRating);
-        out.writeValue(releaseDate);
-    }
-
-    public static final Parcelable.Creator<MovieItem> CREATOR = new Parcelable.Creator<MovieItem>() {
-        public MovieItem createFromParcel(Parcel in) {
-            return new MovieItem(in);
-        }
-
-        public MovieItem[] newArray(int size) {
-            return new MovieItem[size];
-        }
-    };
-
-    private MovieItem(Parcel in) {
-        id = in.readInt();
-        originalTitle = in.readString();
-        plotSynopsys = in.readString();
-        posterImageUrl = (URL) in.readValue(URL.class.getClassLoader());
-        averageUserRating = in.readDouble();
-        releaseDate = (Date) in.readValue(Date.class.getClassLoader());
     }
 }
