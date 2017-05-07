@@ -18,10 +18,10 @@ import info.edoardonosotti.popularmovies.data.MovieItemsAdapter;
 import info.edoardonosotti.popularmovies.data.db.DAL;
 import info.edoardonosotti.popularmovies.helpers.NetworkHelper;
 import info.edoardonosotti.popularmovies.tasks.FetchMoviesTask;
-import info.edoardonosotti.popularmovies.tasks.IOnTaskCompleted;
+import info.edoardonosotti.popularmovies.tasks.IOnFetchMoviesTaskCompleted;
 
 public class MainActivity extends AppCompatActivity
-        implements MovieItemsAdapter.MovieItemsAdapterOnClickHandler, IOnTaskCompleted {
+        implements MovieItemsAdapter.MovieItemsAdapterOnClickHandler, IOnFetchMoviesTaskCompleted {
 
     public static final String INTENT_SELECTED_MOVIE = "SELECTED_MOVIE";
 
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onTaskCompleted(Object output) {
+    public void onFetchMoviesTaskCompleted(Object output) {
         MovieItem[] movieItems = (MovieItem[]) output;
         mMovieItemsAdapter.setMovieData(movieItems);
         mMovieItemsAdapter.notifyDataSetChanged();
