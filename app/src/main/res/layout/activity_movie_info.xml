@@ -31,6 +31,11 @@
                 android:adjustViewBounds="true"
                 android:scaleType="fitCenter" />
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#c0c0c0"/>
+
             <TextView
                 android:id="@+id/tv_movie_info_release"
                 android:layout_width="wrap_content"
@@ -49,11 +54,19 @@
                 android:text="..."
                 android:textSize="18sp" />
 
+            <Button
+                android:id="@+id/tb_move_info_favourite"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_movie_info_rating"
+                android:layout_margin="24dp"
+                android:text="..." />
+
             <TextView
                 android:id="@+id/tv_movie_info_plot"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tv_movie_info_rating"
+                android:layout_below="@+id/tb_move_info_favourite"
                 android:padding="24dp"
                 android:text="..."
                 android:textSize="14sp" />

@@ -3,6 +3,7 @@ package info.edoardonosotti.popularmovies.data.db;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -38,8 +39,16 @@ public class DAL {
         values.put(FavouriteMoviesContract.FavouriteMovieItem.COLUMN_NAME_TITLE, movieItem.originalTitle);
         values.put(FavouriteMoviesContract.FavouriteMovieItem.COLUMN_NAME_POSTER, movieItem.posterImageUrl.toString());
 
-        return getDBInstance(true)
-            .insert(FavouriteMoviesContract.FavouriteMovieItem.TABLE_NAME, null, values);
+        try {
+            return getDBInstance(true)
+                    .insertOrThrow(FavouriteMoviesContract.FavouriteMovieItem.TABLE_NAME, null, values);
+        }
+        catch (SQLException e) {
+            Log.e(TAG, "SQLITE ERROR", e);
+            e.printStackTrace();
+        }
+
+        return -1;
     }
 
     public MovieItem[] getFavouriteMovies() {
@@ -97,9 +106,9 @@ public class DAL {
         return (cursor.getCount() > 0);
     }
 
-    public void deleteFavouriteMovie(long favouriteMovieRecordId) {
-        String selection = FavouriteMoviesContract.FavouriteMovieItem._ID + " = ?";
-        String[] selectionArgs = { String.valueOf(favouriteMovieRecordId) };
+    public void deleteFavouriteMovie(int movieId) {
+        String selection = FavouriteMoviesContract.FavouriteMovieItem.COLUMN_NAME_MOVIE_ID + " = ?";
+        String[] selectionArgs = { String.valueOf(movieId) };
         getDBInstance(true).delete(FavouriteMoviesContract.FavouriteMovieItem.TABLE_NAME, selection, selectionArgs);
     }
 

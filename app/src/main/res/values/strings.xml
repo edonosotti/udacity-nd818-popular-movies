@@ -6,5 +6,8 @@
     <string name="movie_info_release">Released: %1$s</string>
     <string name="movie_info_rating">User rating: %1$s/10</string>
     <string name="error_missing_api_key">API key is missing! Please provide a valid key.</string>
+    <string name="error_cannot_write_database">An error has occurred, the data was not saved.</string>
     <string name="generic_error">An error has occurred. Your request could not be fulfilled.</string>
+    <string name="btn_favourite_off">Add to favourites</string>
+    <string name="btn_favourite_on">Remove from favourites</string>
 </resources>

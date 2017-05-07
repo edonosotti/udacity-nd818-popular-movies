@@ -1,24 +1,29 @@
 package info.edoardonosotti.popularmovies;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.squareup.picasso.Picasso;
 
 import info.edoardonosotti.popularmovies.data.MovieItem;
+import info.edoardonosotti.popularmovies.data.db.DAL;
 import info.edoardonosotti.popularmovies.helpers.NetworkHelper;
 import info.edoardonosotti.popularmovies.tasks.FetchMovieInfoTask;
 import info.edoardonosotti.popularmovies.tasks.FetchMoviesTask;
 import info.edoardonosotti.popularmovies.tasks.IOnTaskCompleted;
 
 public class MovieInfoActivity extends AppCompatActivity implements IOnTaskCompleted {
-
+    DAL mDAL;
     MovieItem mMovieItem;
 
     TextView mTitle;
@@ -26,19 +31,36 @@ public class MovieInfoActivity extends AppCompatActivity implements IOnTaskCompl
     TextView mRating;
     TextView mPlot;
     ImageView mPoster;
+    Button mFavouriteButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_info);
 
+        mDAL = new DAL(this);
+
         mTitle = (TextView) findViewById(R.id.tv_movie_info_title);
         mRelease = (TextView) findViewById(R.id.tv_movie_info_release);
         mRating = (TextView) findViewById(R.id.tv_movie_info_rating);
         mPlot = (TextView) findViewById(R.id.tv_movie_info_plot);
         mPoster = (ImageView) findViewById(R.id.iv_movie_info_poster);
+        mFavouriteButton = (Button) findViewById(R.id.tb_move_info_favourite);
 
         loadMovieData(getIntent());
+        handleFavouriteButtonPress();
+    }
+
+
+    @Override
+    public void onTaskCompleted(Object output) {
+        if (output != null) {
+            mMovieItem = (MovieItem) output;
+            showMovieInfo();
+            checkFavouriteStatus();
+        } else {
+            showErrorMessage(R.string.generic_error);
+        }
     }
 
     public void showMovieInfo() {
@@ -59,13 +81,43 @@ public class MovieInfoActivity extends AppCompatActivity implements IOnTaskCompl
         }
     }
 
-    @Override
-    public void onTaskCompleted(Object output) {
-        if (output != null) {
-            mMovieItem = (MovieItem) output;
-            showMovieInfo();
+    public void handleFavouriteButtonPress() {
+        mFavouriteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeFavouriteStatus();
+                checkFavouriteStatus();
+            }
+        });
+    }
+
+    public void changeFavouriteStatus() {
+        if (mMovieItem != null) {
+            if (!mDAL.isMovieFavourite(mMovieItem.id)) {
+                long insertId = mDAL.addFavouriteMovie(mMovieItem);
+                if (insertId == -1) {
+                    showErrorMessage(R.string.error_cannot_write_database);
+                }
+            } else {
+                mDAL.deleteFavouriteMovie(mMovieItem.id);
+            }
+        }
+    }
+
+    public void checkFavouriteStatus() {
+        if (mMovieItem != null) {
+            if (mDAL.isMovieFavourite(mMovieItem.id)) {
+                mFavouriteButton.setText(R.string.btn_favourite_on);
+                mFavouriteButton.setBackgroundColor(Color.RED);
+            } else {
+                mFavouriteButton.setText(R.string.btn_favourite_off);
+                mFavouriteButton.setBackgroundColor(Color.GREEN);
+            }
+
+            mFavouriteButton.setVisibility(View.VISIBLE);
+
         } else {
-            showErrorMessage(R.string.generic_error);
+            mFavouriteButton.setVisibility(View.GONE);
         }
     }
 
