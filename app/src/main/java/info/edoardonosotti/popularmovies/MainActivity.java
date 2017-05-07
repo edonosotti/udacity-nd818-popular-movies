@@ -133,8 +133,8 @@ public class MainActivity extends AppCompatActivity
 
     private void showMoviesData() {
         if (mMovieItemsAdapter.getItemCount() > 0) {
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
-            mErrorMessageDisplay.setVisibility(View.INVISIBLE);
+            mLoadingIndicator.setVisibility(View.GONE);
+            mErrorMessageDisplay.setVisibility(View.GONE);
 
             mRecyclerView.setVisibility(View.VISIBLE);
         } else {
@@ -143,8 +143,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showErrorMessage(int errorStringId) {
-        mLoadingIndicator.setVisibility(View.INVISIBLE);
-        mRecyclerView.setVisibility(View.INVISIBLE);
+        mLoadingIndicator.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.GONE);
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
         mErrorMessageDisplay.setText(errorStringId);
     }
