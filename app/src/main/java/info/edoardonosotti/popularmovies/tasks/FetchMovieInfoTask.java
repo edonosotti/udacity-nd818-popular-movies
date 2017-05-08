@@ -14,9 +14,9 @@ public class FetchMovieInfoTask extends AsyncTask<Void, Void, MovieItem> {
     private static final String TAG = FetchMovieInfoTask.class.getSimpleName();
 
     private FetchMovieInfoTaskConfiguration config;
-    private IOnTaskCompleted listener;
+    private IOnFetchMoviesTaskCompleted listener;
 
-    public FetchMovieInfoTask(FetchMovieInfoTaskConfiguration config, IOnTaskCompleted listener) {
+    public FetchMovieInfoTask(FetchMovieInfoTaskConfiguration config, IOnFetchMoviesTaskCompleted listener) {
         this.config = config;
         this.listener = listener;
     }
@@ -60,7 +60,7 @@ public class FetchMovieInfoTask extends AsyncTask<Void, Void, MovieItem> {
 
     @Override
     protected void onPostExecute(MovieItem movieItem) {
-        listener.onTaskCompleted(movieItem);
+        listener.onFetchMoviesTaskCompleted(movieItem);
     }
 
     public static class FetchMovieInfoTaskConfiguration {

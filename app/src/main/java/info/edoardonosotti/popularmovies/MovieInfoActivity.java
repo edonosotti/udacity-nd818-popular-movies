@@ -2,27 +2,33 @@ package info.edoardonosotti.popularmovies;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.squareup.picasso.Picasso;
 
 import info.edoardonosotti.popularmovies.data.MovieItem;
+import info.edoardonosotti.popularmovies.data.MovieTrailer;
+import info.edoardonosotti.popularmovies.data.MovieTrailersAdapter;
 import info.edoardonosotti.popularmovies.data.db.DAL;
 import info.edoardonosotti.popularmovies.helpers.NetworkHelper;
 import info.edoardonosotti.popularmovies.tasks.FetchMovieInfoTask;
-import info.edoardonosotti.popularmovies.tasks.FetchMoviesTask;
-import info.edoardonosotti.popularmovies.tasks.IOnTaskCompleted;
+import info.edoardonosotti.popularmovies.tasks.IOnFetchMoviesTaskCompleted;
 
-public class MovieInfoActivity extends AppCompatActivity implements IOnTaskCompleted {
+public class MovieInfoActivity extends AppCompatActivity
+        implements IOnFetchMoviesTaskCompleted,
+        MovieTrailersAdapter.MovieTrailersAdapterOnClickHandler {
+
     DAL mDAL;
     MovieItem mMovieItem;
 
@@ -32,6 +38,11 @@ public class MovieInfoActivity extends AppCompatActivity implements IOnTaskCompl
     TextView mPlot;
     ImageView mPoster;
     Button mFavouriteButton;
+
+    RecyclerView mRecyclerViewTrailers;
+    RecyclerView mRecyclerViewReviews;
+
+    MovieTrailersAdapter mMovieTrailersAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,13 +58,16 @@ public class MovieInfoActivity extends AppCompatActivity implements IOnTaskCompl
         mPoster = (ImageView) findViewById(R.id.iv_movie_info_poster);
         mFavouriteButton = (Button) findViewById(R.id.tb_move_info_favourite);
 
+        mRecyclerViewTrailers = (RecyclerView) findViewById(R.id.rv_trailers);
+        mRecyclerViewReviews = (RecyclerView) findViewById(R.id.rv_reviews);
+
         loadMovieData(getIntent());
         handleFavouriteButtonPress();
     }
 
 
     @Override
-    public void onTaskCompleted(Object output) {
+    public void onFetchMoviesTaskCompleted(Object output) {
         if (output != null) {
             mMovieItem = (MovieItem) output;
             showMovieInfo();
@@ -78,6 +92,8 @@ public class MovieInfoActivity extends AppCompatActivity implements IOnTaskCompl
                     .placeholder(R.drawable.img_loading)
                     .error(R.drawable.img_no_image)
                     .into(mPoster);
+
+            loadSubPanelsData();
         }
     }
 
@@ -135,7 +151,25 @@ public class MovieInfoActivity extends AppCompatActivity implements IOnTaskCompl
         }
     }
 
+    protected void loadSubPanelsData() {
+        mRecyclerViewTrailers.setLayoutManager(new GridLayoutManager(this, 1));
+        mMovieTrailersAdapter = new MovieTrailersAdapter(this);
+        mRecyclerViewTrailers.setAdapter(mMovieTrailersAdapter);
+        mMovieTrailersAdapter.setMovieTrailersData(mMovieItem.trailers);
+        mMovieTrailersAdapter.notifyDataSetChanged();
+
+
+        // mRecyclerViewReviews.setLayoutManager(trailersLayoutManager);
+    }
+
     protected void showErrorMessage(int errorStringId) {
         Toast.makeText(this, errorStringId, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onClick(MovieTrailer movieTrailer) {
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(movieTrailer.url.toString()));
+        startActivity(i);
     }
 }

@@ -15,4 +15,7 @@
     <string name="btn_favourite_off">Add to favourites</string>
     <string name="btn_favourite_on">Remove from favourites</string>
     <string name="no_data">There is no data to show.</string>
+    <string name="title_plot">Plot synopsis</string>
+    <string name="title_trailers">Trailers</string>
+    <string name="title_reviews">Reviews</string>
 </resources>
