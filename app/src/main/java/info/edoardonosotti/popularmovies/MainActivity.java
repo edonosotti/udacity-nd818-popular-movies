@@ -2,10 +2,13 @@ package info.edoardonosotti.popularmovies;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.GridLayoutManager;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,9 +16,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import info.edoardonosotti.popularmovies.data.FavouriteMoviesContentProvider;
 import info.edoardonosotti.popularmovies.data.MovieItem;
 import info.edoardonosotti.popularmovies.data.MovieItemsAdapter;
-import info.edoardonosotti.popularmovies.data.db.DAL;
 import info.edoardonosotti.popularmovies.helpers.NetworkHelper;
 import info.edoardonosotti.popularmovies.tasks.FetchMoviesTask;
 import info.edoardonosotti.popularmovies.tasks.IOnFetchMoviesTaskCompleted;
@@ -25,6 +28,9 @@ public class MainActivity extends AppCompatActivity
 
     public static final String INTENT_SELECTED_MOVIE = "SELECTED_MOVIE";
 
+    private static final String SAVED_INSTANCE_LIST_TYPE = "LIST_TYPE";
+    private static final String SAVED_INSTANCE_FAVOURITES = "FAVOURITES";
+
     private RecyclerView mRecyclerView;
     private ProgressBar mLoadingIndicator;
     private TextView mErrorMessageDisplay;
@@ -32,6 +38,7 @@ public class MainActivity extends AppCompatActivity
 
     private MovieItemsAdapter mMovieItemsAdapter;
 
+    private int mCurrentRemoteListType = -1;
     private boolean mFavouritesSelected = false;
 
     @Override
@@ -46,11 +53,9 @@ public class MainActivity extends AppCompatActivity
         setGridLayoutManager();
         setGridAdapter();
 
-        if (Common.TMDB_API_KEY.equals("")) {
-            Toast.makeText(this, R.string.error_missing_api_key, Toast.LENGTH_LONG).show();
-        } else {
-            mListTitle.setText(R.string.movie_list_title_popular);
-            loadMovieData(FetchMoviesTask.SORT_MODE_POPULAR);
+        if (savedInstanceState != null) {
+            mCurrentRemoteListType = savedInstanceState.getInt(SAVED_INSTANCE_LIST_TYPE);
+            mFavouritesSelected = savedInstanceState.getBoolean(SAVED_INSTANCE_FAVOURITES);
         }
     }
 
@@ -58,9 +63,10 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
 
-        if (mFavouritesSelected) {
-            // Force refresh of favourite movies list on BACK from details activity
-            loadFavouritesMovieData();
+        if (TextUtils.isEmpty(Common.TMDB_API_KEY)) {
+            Toast.makeText(this, R.string.error_missing_api_key, Toast.LENGTH_LONG).show();
+        } else {
+            loadMovieData();
         }
     }
 
@@ -82,13 +88,13 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.menu_action_sort_by_popularity) {
-            mListTitle.setText(R.string.movie_list_title_popular);
-            loadMovieData(FetchMoviesTask.SORT_MODE_POPULAR);
+            mCurrentRemoteListType = FetchMoviesTask.SORT_MODE_POPULAR;
+            loadRemoteMovieData();
             return true;
         }
         else if (id == R.id.menu_action_sort_by_rating) {
-            mListTitle.setText(R.string.movie_list_title_toprated);
-            loadMovieData(FetchMoviesTask.SORT_MODE_RATING);
+            mCurrentRemoteListType = FetchMoviesTask.SORT_MODE_RATING;
+            loadRemoteMovieData();
             return true;
         }
         else if (id == R.id.menu_action_show_favourites) {
@@ -107,6 +113,13 @@ public class MainActivity extends AppCompatActivity
         showMoviesData();
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putInt(SAVED_INSTANCE_LIST_TYPE, mCurrentRemoteListType);
+        savedInstanceState.putBoolean(SAVED_INSTANCE_FAVOURITES, mFavouritesSelected);
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
     protected void setGridLayoutManager() {
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_movies);
         mRecyclerView.setHasFixedSize(true);
@@ -123,12 +136,32 @@ public class MainActivity extends AppCompatActivity
         mRecyclerView.setAdapter(mMovieItemsAdapter);
     }
 
-    protected void loadMovieData(int sortType) {
+    protected void loadMovieData() {
+        if (mFavouritesSelected) {
+            loadFavouritesMovieData();
+        } else {
+            loadRemoteMovieData();
+        }
+    }
+
+    protected void loadRemoteMovieData() {
+        if (mCurrentRemoteListType < 0) {
+            mCurrentRemoteListType = FetchMoviesTask.SORT_MODE_POPULAR;
+        }
+
         mFavouritesSelected = false;
         mLoadingIndicator.setVisibility(View.VISIBLE);
+
+        if (mCurrentRemoteListType == FetchMoviesTask.SORT_MODE_POPULAR) {
+            mListTitle.setText(R.string.movie_list_title_popular);
+        } else {
+            mListTitle.setText(R.string.movie_list_title_toprated);
+        }
+
         if (NetworkHelper.networkIsAvailable(MainActivity.this)) {
             FetchMoviesTask.FetchMoviesTaskConfiguration config =
-                    new FetchMoviesTask.FetchMoviesTaskConfiguration(Common.TMDB_API_KEY, sortType);
+                    new FetchMoviesTask.FetchMoviesTaskConfiguration(Common.TMDB_API_KEY,
+                            mCurrentRemoteListType);
             new FetchMoviesTask(config, this).execute();
         } else {
             showErrorMessage(R.string.network_unavailable);
@@ -139,14 +172,21 @@ public class MainActivity extends AppCompatActivity
         mFavouritesSelected = true;
         mLoadingIndicator.setVisibility(View.VISIBLE);
         mListTitle.setText(R.string.movie_list_title_favourite);
-        DAL dal = new DAL(this);
-        MovieItem[] movieItems = dal.getFavouriteMovies();
-        mMovieItemsAdapter.setMovieData(movieItems);
-        mMovieItemsAdapter.notifyDataSetChanged();
-        showMoviesData();
+        Uri uri = FavouriteMoviesContentProvider.CONTENT_URI;
+
+        try {
+            Cursor cursor = getContentResolver().query(uri, new String[0], "", new String[0], "");
+            mMovieItemsAdapter.setMovieData(cursor);
+            mMovieItemsAdapter.notifyDataSetChanged();
+            showMoviesData();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            showErrorMessage(R.string.generic_error);
+        }
     }
 
-    private void showMoviesData() {
+    protected void showMoviesData() {
         if (mMovieItemsAdapter.getItemCount() > 0) {
             mLoadingIndicator.setVisibility(View.GONE);
             mErrorMessageDisplay.setVisibility(View.GONE);
@@ -157,7 +197,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void showErrorMessage(int errorStringId) {
+    protected void showErrorMessage(int errorStringId) {
         mLoadingIndicator.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.GONE);
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
