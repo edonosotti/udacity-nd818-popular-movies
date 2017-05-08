@@ -56,7 +56,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tv_movie_info_rating"
-                android:layout_margin="@dimen/movie_info_activity_padding"
+                android:padding="4dp"
+                android:layout_marginLeft="@dimen/movie_info_activity_padding"
+                android:layout_marginRight="@dimen/movie_info_activity_padding"
+                android:layout_marginTop="@dimen/movie_info_activity_padding"
                 android:text="..." />
 
             <TextView
@@ -101,12 +104,25 @@
                 android:paddingLeft="@dimen/movie_info_activity_padding"
                 android:paddingRight="@dimen/movie_info_activity_padding" />
 
+            <TextView
+                android:id="@+id/tv_movie_info_reviews_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/rv_trailers"
+                android:paddingLeft="@dimen/movie_info_activity_padding"
+                android:paddingRight="@dimen/movie_info_activity_padding"
+                android:paddingTop="@dimen/movie_info_activity_padding"
+                android:text="@string/title_reviews"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_reviews"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/rv_trailers"
-                android:padding="@dimen/movie_info_activity_padding" />
+                android:layout_below="@+id/tv_movie_info_reviews_title"
+                android:paddingLeft="@dimen/movie_info_activity_padding"
+                android:paddingRight="@dimen/movie_info_activity_padding" />
 
         </RelativeLayout>
 

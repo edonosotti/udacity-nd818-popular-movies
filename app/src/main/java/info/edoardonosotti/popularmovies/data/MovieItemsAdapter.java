@@ -1,7 +1,9 @@
 package info.edoardonosotti.popularmovies.data;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +11,12 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+
 import info.edoardonosotti.popularmovies.R;
+import info.edoardonosotti.popularmovies.data.db.FavouriteMoviesContract;
 
 public class MovieItemsAdapter extends RecyclerView.Adapter<MovieItemsAdapter.MovieItemsAdapterViewHolder> {
     private Context mContext;
@@ -48,6 +55,30 @@ public class MovieItemsAdapter extends RecyclerView.Adapter<MovieItemsAdapter.Mo
 
     public void setMovieData(MovieItem[] movieItems) {
         mMovieItems = movieItems;
+    }
+
+    public void setMovieData(Cursor cursor) {
+        ArrayList<MovieItem> movies = new ArrayList<>();
+
+        while (cursor.moveToNext()) {
+            MovieItem movieItem = new MovieItem();
+
+            movieItem.favouriteMovieRecordId = cursor.getLong(cursor.getColumnIndexOrThrow(FavouriteMoviesContract.FavouriteMovieItem._ID));
+            movieItem.id = cursor.getInt(cursor.getColumnIndexOrThrow(FavouriteMoviesContract.FavouriteMovieItem.COLUMN_NAME_MOVIE_ID));
+            movieItem.originalTitle = cursor.getString(cursor.getColumnIndexOrThrow(FavouriteMoviesContract.FavouriteMovieItem.COLUMN_NAME_TITLE));
+
+            String posterImageUrl = cursor.getString(cursor.getColumnIndexOrThrow(FavouriteMoviesContract.FavouriteMovieItem.COLUMN_NAME_POSTER));
+
+            try {
+                movieItem.posterImageUrl = new URL(posterImageUrl);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+
+            movies.add(movieItem);
+        }
+
+        mMovieItems =  movies.toArray(new MovieItem[0]);
     }
 
     public interface MovieItemsAdapterOnClickHandler {
