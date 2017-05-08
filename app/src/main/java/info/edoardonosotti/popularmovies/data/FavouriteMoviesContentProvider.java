@@ -1,14 +1,13 @@
 package info.edoardonosotti.popularmovies.data;
 
 import android.content.ContentProvider;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
+import android.util.Log;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -17,6 +16,8 @@ import info.edoardonosotti.popularmovies.data.db.DBHelper;
 import info.edoardonosotti.popularmovies.data.db.FavouriteMoviesContract;
 
 public class FavouriteMoviesContentProvider extends ContentProvider {
+    private static final String TAG = FavouriteMoviesContentProvider.class.getSimpleName();
+
     private DBHelper mDBHelper;
 
     private static final int MOVIES = 10;
@@ -70,6 +71,7 @@ public class FavouriteMoviesContentProvider extends ContentProvider {
                 break;
 
             default:
+                Log.e(TAG, "Unknown URI: " + uri);
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
 
@@ -98,6 +100,7 @@ public class FavouriteMoviesContentProvider extends ContentProvider {
                 break;
 
             default:
+                Log.e(TAG, "Unknown URI: " + uri);
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
 
@@ -125,6 +128,7 @@ public class FavouriteMoviesContentProvider extends ContentProvider {
                 break;
 
             default:
+                Log.e(TAG, "Unknown URI: " + uri);
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
 
@@ -161,6 +165,7 @@ public class FavouriteMoviesContentProvider extends ContentProvider {
                 break;
 
             default:
+                Log.e(TAG, "Unknown URI: " + uri);
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
 
@@ -181,6 +186,7 @@ public class FavouriteMoviesContentProvider extends ContentProvider {
             HashSet<String> requestedColumns = new HashSet<>(Arrays.asList(projection));
             HashSet<String> availableColumns = new HashSet<>(Arrays.asList(valid));
             if (!availableColumns.containsAll(requestedColumns)) {
+                Log.e(TAG, "Unknown columns in projection");
                 throw new IllegalArgumentException("Unknown columns in projection");
             }
         }
