@@ -1,3 +1,6 @@
+[![codebeat badge](https://codebeat.co/badges/11ec2f6c-2f8d-48ea-8e4f-70012ad93a4c)](https://codebeat.co/projects/github-com-edonosotti-udacity-nd818-popular-movies-master)
+[![Maintainability](https://api.codeclimate.com/v1/badges/96631343a17c481d6b17/maintainability)](https://codeclimate.com/github/edonosotti/udacity-nd818-popular-movies/maintainability)
+
 # Popular Movies
 
 ## Description
